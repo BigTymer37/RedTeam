@@ -7,6 +7,7 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.IO;
 
+//Make sure to add reference for System.Mangement.Automation.
 
 namespace UploadExec
 {
