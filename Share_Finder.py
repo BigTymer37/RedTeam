@@ -1,0 +1,62 @@
+import argparse
+import subprocess
+
+parser = argparse.ArgumentParser(description='Parse Shares for Sensitive Information')
+parser.add_argument('--username', metavar='User', help='Username for Authentication.')
+parser.add_argument('--password', metavar='Password', help='Password for Authentication.')
+parser.add_argument('--domain', metavar='Domain', help='Domain for Authenticaiton.')
+parser.add_argument('--ip', metavar='IP Address', help='IP Address for Shares.')
+parser.add_argument('--list', metavar='List of IPs', help='List of IP Addresses to Parse.')
+args = parser.parse_args()
+
+
+def cme_enum():
+    if args.ip:
+        command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | tee cmeshares.out') % (args.ip,args.username,args.password,args.domain)
+        cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+        (cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
+        print(cme_enum_results_stdout)
+    elif args.list:
+        command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | tee cmeshares.out') % (args.list,args.username,args.password,args.domain)
+        cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+        (cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
+        print(cme_enum_results_stdout)
+    else:
+        print("\nA Single IP or List Needs to be Provided!")
+cme_enum()
+
+
+def parse_cme_output():
+    command = str("""sort -u -k5 cmeshares.out | grep -i 'read\|write' | grep -v 'IPC\|print' | awk '{print $2"/"$5}' | sed 's/\x1b\[[0-9;]*m//g' > sharessorted.txt""")
+    cme_parse_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+    (cme_parse_results_stdout, cme_parse_results_stderr) = cme_parse_results.communicate()
+    print(cme_parse_results_stdout)
+parse_cme_output()
+
+def create_mountpoints():
+	shares = open('sharessorted.txt', 'r')
+	try:
+		for share in shares:
+			command = str('mkdir -p /mnt/%s') % (share[:-1])
+			create_mountpoint_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+			(create_mountpoint_results_stdout, create_mountpoint_results_stderr) = create_mountpoint_results.communicate()
+			print(create_mountpoint_results_stdout)	
+	except Exception:
+		print("Problem Creating Mountpoint Directories!")
+		print(create_mountpoint_restults_stderr)
+create_mountpoints()
+
+def mount_shares():
+	shares = open('sharessorted.txt', 'r')
+	try:
+		for share in shares:
+			command = str('mount -t cifs -o username=%s,password=%s,domain=%s //%s /mnt/%s')% (args.username,args.password,args.domain,share[:-1],share[:-1])
+			print(command)
+			mount_shares_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+			(mount_shares_results_stdout, mount_shares_results_stderr) = mount_shares_results.communicate()
+			print(mount_shares_results_stdout)
+	except Exception:
+		print("Problem Mounting Share: " + share)
+		print(mount_shares_results_stderr)
+mount_shares()
+
