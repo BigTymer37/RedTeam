@@ -68,16 +68,23 @@ mount_shares()
 
 
 def check_mounts():
-        command = str('ls /mnt/')
-        check_mnt_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
-        (check_mnt_results_stdout, check_mnt_results_stderr) = check_mnt_results.communicate()
-        mnts =check_mnt_results_stdout
-        for mnt in mnts.split('\n')[:-1]:
-                print("This Mount Was Found: /mnt/" +mnt)
-                mnt_pts.append('/mnt/'+mnt +'\n')
+	command = str('ls /mnt/')
+	check_mnt_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+	(check_mnt_results_stdout, check_mnt_results_stderr) = check_mnt_results.communicate()
+	mnts = check_mnt_results_stdout
+	for mnt in mnts.split('\n')[:-1]:
+		print("This Mount Was Found: /mnt/" +mnt)
+		mnt_pts.append('/mnt/'+mnt +'\n')
 check_mounts()
 
-def print_mounts():
-        for mnt in mnt_pts:
-                print mnt
-print_mounts()
+def search_mounts():
+	for mnt in mnt_pts:
+		mnt_filename = str(mnt.replace('/mnt/','') +'-results.txt')
+		mnt_file = open(mnt_filename, 'w')
+		command = str("""rg --type-add 'stratum:*.{config,conf,cnf,ini,php,py,pl,xml,txt,cs,html,log,myd,secrets,ovpn,pem,crt,cer,db,yml,yaml,tdb,vdb,passwd,vnc,cnt}' -tstratum password """ + mnt)
+		print(command)
+		search_mnt_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+		(search_mnt_results_stdout, search_mnt_results_stderr) = search_mnt_results.communicate()
+		mnt_file.write(str(search_mnt_results_stdout))
+		mnt_file.close()
+search_mounts()
