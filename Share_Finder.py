@@ -81,10 +81,12 @@ def search_mounts():
 	for mnt in mnt_pts:
 		mnt_filename = str(mnt[:-1].replace('/mnt/','') +'-results.txt')
 		mnt_file = open(mnt_filename, 'w')
-		command = str("""rg --type-add 'stratum:*.{config,conf,cnf,ini,php,py,pl,xml,txt,cs,html,log,myd,secrets,ovpn,pem,key,ppk,id_rsa,crt,cer,db,yml,yaml,tdb,vdb,passwd,vnc,cnt}' -tstratum 'password=|PASSWORD =|PASSWORD=|password =|Password=|apitoken|passwd|credentials|connectionString|cpassword|ftp://|api_token|apikey|APIKEY|API_KEY|API-KEY|api-key|api_key|Bearer |PRIVATE KEY|key=' """ + mnt)
+		command = str("""rg --type-add 'stratum:*.{config,conf,cnf,ini,php,py,pl,ps1,xml,txt,cs,html,log,myd,secrets,ovpn,pem,key,ppk,id_rsa,crt,cer,db,yml,yaml,tdb,vdb,passwd,vnc,cnt}' -tstratum 'password=|PASSWORD =|PASSWORD=|password =|Password=|apitoken|passwd|credentials|connectionString|cpassword|ftp://|api_token|apikey|APIKEY|API_KEY|API-KEY|api-key|api_key|Bearer |PRIVATE KEY|key=|AccountName=|AccountKey=|aws_access_key_id|aws_secret_access_key|AKIA|AWS_SECRET' """ + mnt)
 		print(command)
 		search_mnt_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
 		(search_mnt_results_stdout, search_mnt_results_stderr) = search_mnt_results.communicate()
 		mnt_file.write(str(search_mnt_results_stdout))
 		mnt_file.close()
 search_mounts()
+
+
