@@ -79,7 +79,7 @@ check_mounts()
 
 def search_mounts():
 	for mnt in mnt_pts:
-		mnt_filename = str(mnt.replace('/mnt/','') +'-results.txt')
+		mnt_filename = str(mnt[:-1].replace('/mnt/','') +'-results.txt')
 		mnt_file = open(mnt_filename, 'w')
 		command = str("""rg --type-add 'stratum:*.{config,conf,cnf,ini,php,py,pl,xml,txt,cs,html,log,myd,secrets,ovpn,pem,crt,cer,db,yml,yaml,tdb,vdb,passwd,vnc,cnt}' -tstratum password """ + mnt)
 		print(command)
