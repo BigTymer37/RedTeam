@@ -1,6 +1,8 @@
 import argparse
 import subprocess
 
+
+#Arg Parser
 parser = argparse.ArgumentParser(description='Parse Shares for Sensitive Information')
 parser.add_argument('--username', metavar='User', help='Username for Authentication.')
 parser.add_argument('--password', metavar='Password', help='Password for Authentication.')
@@ -8,6 +10,10 @@ parser.add_argument('--domain', metavar='Domain', help='Domain for Authenticaito
 parser.add_argument('--ip', metavar='IP Address', help='IP Address for Shares.')
 parser.add_argument('--list', metavar='List of IPs', help='List of IP Addresses to Parse.')
 args = parser.parse_args()
+
+
+#Arrays Utilized
+mnt_pts = []
 
 
 def cme_enum():
@@ -61,3 +67,17 @@ def mount_shares():
 mount_shares()
 
 
+def check_mounts():
+        command = str('ls /mnt/')
+        check_mnt_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+        (check_mnt_results_stdout, check_mnt_results_stderr) = check_mnt_results.communicate()
+        mnts =check_mnt_results_stdout
+        for mnt in mnts.split('\n')[:-1]:
+                print("This Mount Was Found: /mnt/" +mnt)
+                mnt_pts.append('/mnt/'+mnt +'\n')
+check_mounts()
+
+def print_mounts():
+        for mnt in mnt_pts:
+                print mnt
+print_mounts()
