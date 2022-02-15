@@ -28,6 +28,9 @@ def find_transforms():
                     (findtransform_results_stdout, findtransform_results_stderr) = findtransform_results.communicate()
                     print(findgroup_results_stdout)
                     print(findgroup_results_stderr)
+                    ike_scan_outputs = findtransform_results_stdout.split()
+                    if ike_scan_outputs[33] == '1':
+                        print "Valid Transform Found: %s" % (transform.strip())
                 except:
                 	pass
         except:
