@@ -14,8 +14,8 @@ def create_transforms():
             for hash in hashes:
                 for authentication in authentications:
                     for group in groups:
-                        print("--trans="+encryption+','+hash+','+authentication+','+group)
-                        transform = ("--trans="+encryption+','+hash+','+authentication+','+group)
+                        print('--trans='+encryption+','+hash+','+authentication+','+group)
+                        transform = ('--trans='+encryption+','+hash+','+authentication+','+group)
                         transforms.append(transform)
 create_transforms()
 
