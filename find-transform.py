@@ -1,8 +1,9 @@
 import subprocess
 
-transforms = []
 
 ip_address = input("What IP address do you want to scan? ")
+
+transforms = []
 
 def create_transforms():
         encryptions = ["1","2","3","4","5","6","7/128","7/192","7/256","8"]
@@ -22,11 +23,14 @@ def find_transforms():
         try:
             for transform in transforms:
                 try:
-                    command = str("""ike-scan -M -A %s %s -P hash.txt""") % (transform.strip(),ip_address)
+                    command = str("""ike-scan -M -A %s %s -P hash.txt""") % (transform[:-1],ip_address)
                     print(command)
                     findtransform_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
                     (findtransform_results_stdout, findtransform_results_stderr) = findtransform_results.communicate()
                     print(findgroup_results_stdout)
                     print(findgroup_results_stderr)
-
+                except:
+                	pass
+        except:
+        	pass
 find_transforms()
