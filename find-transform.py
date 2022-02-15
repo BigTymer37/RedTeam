@@ -14,8 +14,8 @@ def create_transforms():
             for hash in hashes:
                 for authentication in authentications:
                     for group in groups:
-                        print('--trans='+encryption+','+hash+','+authentication+','+group)
-                        transform = ('--trans='+encryption+','+hash+','+authentication+','+group)
+                        print("--trans="+encryption+','+hash+','+authentication+','+group)
+                        transform = ("--trans="+encryption+','+hash+','+authentication+','+group)
                         transforms.append(transform)
 create_transforms()
 
@@ -23,7 +23,7 @@ def find_transforms():
         try:
             for transform in transforms:
                 try:
-                    command = str("""ike-scan -M -A %s %s -P hash.txt""") % (transform[:-1],ip_address)
+                    command = str("""ike-scan -M %s %s""") % (transform.strip(),ip_address)
                     print(command)
                     findtransform_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
                     (findtransform_results_stdout, findtransform_results_stderr) = findtransform_results.communicate()
