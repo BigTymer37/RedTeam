@@ -23,7 +23,7 @@ def find_transforms():
         try:
             for transform in transforms:
                 try:
-                    command = str("""ike-scan -M -A %s %s -P hash.txt""") % (transform[:-1],ip_address)
+                    command = str("""ike-scan -M -A %s %s -P hash.txt""") % (transform.strip(),ip_address)
                     print(command)
                     findtransform_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
                     (findtransform_results_stdout, findtransform_results_stderr) = findtransform_results.communicate()
