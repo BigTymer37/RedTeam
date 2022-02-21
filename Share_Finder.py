@@ -1,6 +1,6 @@
 import argparse
 import subprocess
-
+from time import sleep
 
 #Arg Parser
 parser = argparse.ArgumentParser(description='Parse Shares for Sensitive Information')
@@ -17,23 +17,25 @@ mnt_pts = []
 
 
 def cme_enum():
-    if args.ip:
-        command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | tee cmeshares.out') % (args.ip,args.username,args.password,args.domain)
-        cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
-        (cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
-        print(cme_enum_results_stdout)
-    elif args.list:
-        command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | tee cmeshares.out') % (args.list,args.username,args.password,args.domain)
-        cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
-        (cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
-        print(cme_enum_results_stdout)
-    else:
-        print("\nA Single IP or List Needs to be Provided!")
+	if args.ip:
+		command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | anew cmeshares.out') % (args.ip,args.username,args.password,args.domain)
+		print(command)
+		cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+		(cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
+		print(cme_enum_results_stdout)
+	elif args.list:
+		command = str('crackmapexec smb %s -u %s -p %s -d %s --shares | anew cmeshares.out') % (args.list,args.username,args.password,args.domain)
+		print(command)
+		cme_enum_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+		(cme_enum_results_stdout, cme_enum_results_stderr) = cme_enum_results.communicate()
+		print(cme_enum_results_stdout)
+	else:
+		print("\nA Single IP or List Needs to be Provided!")
 cme_enum()
 
 
 def parse_cme_output():
-    command = str("""sort -u -k5 cmeshares.out | grep -i 'read\|write' | grep -v 'IPC\|print' | awk '{print $2"/"$5}' | sed 's/\x1b\[[0-9;]*m//g' > sharessorted.txt""")
+    command = str("""sudo sort -u -k5 cmeshares.out | grep -i 'read\|write' | grep -v 'IPC\|print' | awk '{print $2"/"$5}' | sed 's/\x1b\[[0-9;]*m//g' > sharessorted.txt""")
     cme_parse_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
     (cme_parse_results_stdout, cme_parse_results_stderr) = cme_parse_results.communicate()
     print(cme_parse_results_stdout)
@@ -43,20 +45,23 @@ def create_mountpoints():
 	shares = open('sharessorted.txt', 'r')
 	try:
 		for share in shares:
-			command = str('mkdir -p /mnt/%s') % (share[:-1])
+			sleep(2)
+			command = str('sudo mkdir -p /mnt/%s') % (share[:-1])
+			print(command)
 			create_mountpoint_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
 			(create_mountpoint_results_stdout, create_mountpoint_results_stderr) = create_mountpoint_results.communicate()
-			print(create_mountpoint_results_stdout)	
+			print(create_mountpoint_results_stdout)
 	except Exception:
 		print("Problem Creating Mountpoint Directories!")
 		print(create_mountpoint_restults_stderr)
+	shares.close()
 create_mountpoints()
 
 def mount_shares():
 	shares = open('sharessorted.txt', 'r')
 	try:
 		for share in shares:
-			command = str('mount -t cifs -o username=%s,password=%s,domain=%s //%s /mnt/%s')% (args.username,args.password,args.domain,share[:-1],share[:-1])
+			command = str('sudo mount -t cifs -o username=%s,password=\'%s\',domain=%s //%s /mnt/%s')% (args.username,args.password,args.domain,share[:-1],share[:-1])
 			print(command)
 			mount_shares_results = subprocess.Popen((command),shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
 			(mount_shares_results_stdout, mount_shares_results_stderr) = mount_shares_results.communicate()
@@ -88,5 +93,4 @@ def search_mounts():
 		mnt_file.write(str(search_mnt_results_stdout))
 		mnt_file.close()
 search_mounts()
-
 
